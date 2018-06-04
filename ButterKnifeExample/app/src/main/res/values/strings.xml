@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">ButterKnifeExample</string>
+    <string name="login_error">Login failed.</string>
+    <array name="cities">
+        <item>Beijing</item>
+        <item>HongKong</item>
+        <item>Shanghai</item>
+        <item>Guangzhou</item>
+        <item>Shenzhen</item>
+    </array>
+    <bool name="isTablet">false</bool>
+</resources>
