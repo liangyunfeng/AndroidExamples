@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
+
+        <ImageView
+            android:id="@+id/iv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/base_demo_btn1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/iv"
+            android:onClick="onClick"
+            android:text="testBase" />
+
+        <Button
+            android:id="@+id/base_demo_btn2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn1"
+            android:onClick="onClick"
+            android:text="testAction" />
+
+        <Button
+            android:id="@+id/base_demo_btn3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn2"
+            android:onClick="onClick"
+            android:text="testPrintArray" />
+
+        <Button
+            android:id="@+id/base_demo_btn4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn3"
+            android:onClick="onClick"
+            android:text="testSetImage" />
+
+        <Button
+            android:id="@+id/base_demo_btn5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn4"
+            android:onClick="onClick"
+            android:text="testSchedulerBase" />
+
+        <Button
+            android:id="@+id/base_demo_btn6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn5"
+            android:onClick="onClick"
+            android:text="testMap" />
+
+        <Button
+            android:id="@+id/base_demo_btn7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn6"
+            android:onClick="onClick"
+            android:text="testFlatmap" />
+
+        <Button
+            android:id="@+id/base_demo_btn8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn7"
+            android:onClick="onClick"
+            android:text="testLift" />
+
+        <Button
+            android:id="@+id/base_demo_btn9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn8"
+            android:onClick="onClick"
+            android:text="testRetrofit" />
+
+        <Button
+            android:id="@+id/base_demo_btn10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn9"
+            android:onClick="onClick"
+            android:text="testRetrofitWithRxJava" />
+
+        <Button
+            android:id="@+id/base_demo_btn11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn10"
+            android:onClick="onClick"
+            android:text="testRetrofit2" />
+
+        <Button
+            android:id="@+id/base_demo_btn12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn11"
+            android:onClick="onClick"
+            android:text="testRetrofitWithRxJava2" />
+
+        <Button
+            android:id="@+id/base_demo_btn13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn12"
+            android:onClick="onClick"
+            android:text="testRxBinding" />
+
+        <Button
+            android:id="@+id/base_demo_btn14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn13"
+            android:onClick="onClick"
+            android:text="testRxBus" />
+
+        <Button
+            android:id="@+id/base_demo_btn15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn14"
+            android:onClick="onClick"
+            android:text="Button" />
+    </RelativeLayout>
+</ScrollView>

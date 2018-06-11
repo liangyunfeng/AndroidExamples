@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
+
+        <TextView
+            android:id="@+id/tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/iv"
+            android:layout_below="@id/tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/base_demo_btn1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/iv"
+            android:onClick="onClick"
+            android:text="testDisposable" />
+
+        <Button
+            android:id="@+id/base_demo_btn2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn1"
+            android:onClick="onClick"
+            android:text="testMap" />
+
+        <Button
+            android:id="@+id/base_demo_btn3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn2"
+            android:onClick="onClick"
+            android:text="testZip" />
+
+        <Button
+            android:id="@+id/base_demo_btn4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn3"
+            android:onClick="onClick"
+            android:text="testConcat" />
+
+        <Button
+            android:id="@+id/base_demo_btn5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn4"
+            android:onClick="onClick"
+            android:text="testFlatmap" />
+
+        <Button
+            android:id="@+id/base_demo_btn6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn5"
+            android:onClick="onClick"
+            android:text="testConcatMap" />
+
+        <Button
+            android:id="@+id/base_demo_btn7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn6"
+            android:onClick="onClick"
+            android:text="testDistinct" />
+
+        <Button
+            android:id="@+id/base_demo_btn8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn7"
+            android:onClick="onClick"
+            android:text="testFilter" />
+
+        <Button
+            android:id="@+id/base_demo_btn9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn8"
+            android:onClick="onClick"
+            android:text="testBuffer" />
+
+        <Button
+            android:id="@+id/base_demo_btn10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn9"
+            android:onClick="onClick"
+            android:text="testTimer" />
+
+        <Button
+            android:id="@+id/base_demo_btn11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn10"
+            android:onClick="onClick"
+            android:text="testInterval" />
+
+        <Button
+            android:id="@+id/base_demo_btn12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn11"
+            android:onClick="onClick"
+            android:text="testDoOnNext" />
+
+        <Button
+            android:id="@+id/base_demo_btn13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn12"
+            android:onClick="onClick"
+            android:text="testSkip" />
+
+        <Button
+            android:id="@+id/base_demo_btn14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn13"
+            android:onClick="onClick"
+            android:text="testTake" />
+
+        <Button
+            android:id="@+id/base_demo_btn15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn14"
+            android:onClick="onClick"
+            android:text="testSingle" />
+
+        <Button
+            android:id="@+id/base_demo_btn16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn15"
+            android:onClick="onClick"
+            android:text="testDebounce" />
+
+        <Button
+            android:id="@+id/base_demo_btn17"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn16"
+            android:onClick="onClick"
+            android:text="testDefer" />
+
+        <Button
+            android:id="@+id/base_demo_btn18"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn17"
+            android:onClick="onClick"
+            android:text="testLast" />
+
+        <Button
+            android:id="@+id/base_demo_btn19"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn18"
+            android:onClick="onClick"
+            android:text="testMerge" />
+
+        <Button
+            android:id="@+id/base_demo_btn20"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn19"
+            android:onClick="onClick"
+            android:text="testReduce" />
+
+        <Button
+            android:id="@+id/base_demo_btn21"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn20"
+            android:onClick="onClick"
+            android:text="testScan" />
+
+        <Button
+            android:id="@+id/base_demo_btn22"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn21"
+            android:onClick="onClick"
+            android:text="testWindow" />
+
+        <Button
+            android:id="@+id/base_demo_btn23"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/base_demo_btn22"
+            android:onClick="onClick"
+            android:text="Button" />
+    </RelativeLayout>
+</ScrollView>
