@@ -1,0 +1,133 @@
+package com.github.liangyunfeng.module_compiler.one;
+
+import com.guthub.liangyunfeng.module_annotation.FindId;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
+import javax.tools.JavaFileObject;
+
+/**
+ * Created by yunfeng.l on 2018/6/12.
+ */
+
+public class TCompiler extends AbstractProcessor{
+    private Filer mFilerUtils;
+    private Elements mElementUtils;
+    private Messager mMessager;
+
+    /**
+     * 一个需要生成的类的集合（key为类的全名，value为该类所有相关的需要的信息
+     */
+    private Map<String, ProxyInfo> mProxyMap = new HashMap<String, ProxyInfo>();
+
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnvironment) {
+        super.init(processingEnvironment);
+        mFilerUtils = processingEnvironment.getFiler();
+        mElementUtils = processingEnvironment.getElementUtils();
+        mMessager = processingEnvironment.getMessager();
+    }
+
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        Set<String> annotationTypes = new LinkedHashSet<>();
+        annotationTypes.add(FindId.class.getCanonicalName());
+        return annotationTypes;
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.RELEASE_8;
+    }
+
+    @Override
+    public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
+        collectInfo(roundEnvironment);
+        generateClass();
+        return true;
+    }
+
+    private void collectInfo(RoundEnvironment roundEnvironment) {
+        // process可能会多次调用，避免生成重复的代理类
+        mProxyMap.clear();
+        // 获得该注解声明的元素
+        Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(FindId.class);
+        //  收集信息
+        for (Element element : elements) {
+            // 获取注解的值
+            int value = element.getAnnotation(FindId.class).value();
+            if(element.getKind().isClass()) {
+                // 处理类注解
+                TypeElement typeElement = (TypeElement) element;
+                // 类的完整路径
+                String qualifiedName = typeElement.getQualifiedName().toString();
+                // 类名
+                String clsName = typeElement.getSimpleName().toString();
+                // 获取包名
+                String packageName = mElementUtils.getPackageOf(typeElement).getQualifiedName().toString();
+
+                ProxyInfo proxyInfo = mProxyMap.get(qualifiedName);
+                if(proxyInfo == null) {
+                    proxyInfo = new ProxyInfo();
+                    mProxyMap.put(qualifiedName, proxyInfo);
+                }
+
+                proxyInfo.value = value;
+                proxyInfo.typeElement = typeElement;
+                proxyInfo.packageName = packageName;
+            } else if(element.getKind().isField()) {
+                // 处理成员变量注解
+                VariableElement variableElement = (VariableElement) element;
+                TypeElement typeElement = (TypeElement)variableElement.getEnclosingElement();
+                String qualifiedName = typeElement.getQualifiedName().toString();
+
+                ProxyInfo proxyInfo = mProxyMap.get(qualifiedName);
+                if(proxyInfo == null) {
+                    proxyInfo = new ProxyInfo();
+                    mProxyMap.put(qualifiedName, proxyInfo);
+                    // 获取包名
+                    String packageName = mElementUtils.getPackageOf(typeElement).getQualifiedName().toString();
+                    proxyInfo.packageName = packageName;
+                }
+                proxyInfo.mInjectElements.put(value,variableElement);
+            } else {
+                continue;
+            }
+        }
+    }
+
+    /**
+     * 生成代理类
+     */
+    public void generateClass() {
+        for (String key : mProxyMap.keySet()) {
+            ProxyInfo proxyInfo = mProxyMap.get(key);
+            JavaFileObject sourceFile = null;
+            try {
+                sourceFile = mFilerUtils.createSourceFile(proxyInfo.getProxyClassFullName(), proxyInfo.typeElement);
+                Writer writer = sourceFile.openWriter();
+                writer.write(proxyInfo.generateJavaCode());
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
