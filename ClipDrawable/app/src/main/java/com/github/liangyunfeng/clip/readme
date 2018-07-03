@@ -1,0 +1,92 @@
+
+canvas.clipRect()
+
+
+
+
+
+
+
+
+注意点
+
+clipOrientation为horizontal时，gravity为top或者bottom时，会被处理为gravity为center.
+clipOritentation为vertical时，gravity为left或者right时，也会处理为gravity为center.
+
+
+
+
+
+
+
+
+
+
+
+
+ClipDrawable的秘密和原理
+
+掌握上面的方法，我们就可以愉快地玩耍了，可以应付很多场景了，比如系统的ProgressBar其实就运用了ClipDrawable作进度条的图像，进行水平方向的裁剪复制。但是，作为开发者而言，还可以稍微深入了解一下它的源码。
+
+其实我看见ClipDrawable就在想它是怎么实现图像的裁剪的。那好，看源代码吧。
+
+
+
+
+
+3. 我们在使用过程是通过ClipDrawable的setLevel()方法，这个方法会触发它的onLevelChange()方法。
+在onLevleChange()中，会设置ClipState中的drawable的level。然后刷新自己，这样触发它的onDraw()方法，对自身进行绘制。
+在onDraw()中通过获取level,然后计算结合它的方向，计算它显示的矩形范围，然后通过canvas.clipRect()方法。最终完成图片的裁剪显示.
+
+
+    @Override
+    public void draw(Canvas canvas) {
+
+        if (mClipState.mDrawable.getLevel() == 0) {
+            return;
+        }
+
+        final Rect r = mTmpRect;
+        final Rect bounds = getBounds();
+        int level = getLevel();
+        int w = bounds.width();
+        final int iw = 0; //mClipState.mDrawable.getIntrinsicWidth();
+        if ((mClipState.mOrientation & HORIZONTAL) != 0) {
+            w -= (w - iw) * (10000 - level) / 10000;
+        }
+        int h = bounds.height();
+        final int ih = 0; //mClipState.mDrawable.getIntrinsicHeight();
+        if ((mClipState.mOrientation & VERTICAL) != 0) {
+            h -= (h - ih) * (10000 - level) / 10000;
+        }
+        final int layoutDirection = getLayoutDirection();
+        Gravity.apply(mClipState.mGravity, w, h, bounds, r, layoutDirection);
+
+        if (w > 0 && h > 0) {
+            canvas.save();
+            canvas.clipRect(r);
+            mClipState.mDrawable.draw(canvas);
+            canvas.restore();
+        }
+    }
+
+
+
+所以归根到底，ClipDrawable的核心就是
+setLevel()和Canvas.clipRect()方法。
+setLevel()设置显示比例，
+ 然后在onDraw()方法中调用计算出来的矩形进行画面的裁剪，正是通过
+canvas.clipRect().
+
+总结
+
+ClipDrawable是一个非常实用的类，合理的运用能让我们节省不少的图片资源，让代码显得整洁与优雅。试想一下，如果没有ClipDrawable去实现一个ProgressBar，
+我们可能要用多张不同宽度的图片去动态同步进度条的值，而有了CllipDrawable后，我们只要一张图片就可以搞定各种宽度的进度值。
+当然，我们可以根据实际的开发情况去定制自己的View。
+
+
+
+
+
+
+
