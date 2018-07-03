@@ -1,0 +1,273 @@
+面讲解 MeasureSpec 的 3 种测量模式。
+
+MeasureSpec.UNSPECIFIED
+
+此种模式表示无限制，子元素告诉父容器它希望它的宽高想要多大就要多大，你不要限制我。一般开发者几乎不需要处理这种情况，在 ScrollView 或者是 AdapterView 中都会处理这样的情况。所以我们可以忽视它。本文中的示例，基本上会跳过它。
+
+MeasureSpec.EXACTLY
+
+此模式说明可以给子元素一个精确的数值。
+
+<Button
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:text="test"/>
+
+当 layout_width 或者 layout_height 的取值为 match_parent 或者 明确的数值如 100dp 时，表明这个维度上的测量模式就是 MeasureSpec.EXACTLY。为什么 match_parent 也有精确的值呢？我们可以合理推断一下，子 View 希望和 父 ViewGroup 一样的宽或者高，对于一个 ViewGroup 而言它显然是可以决定自己的宽高的，所以当它的子 View 提出 match_parent 的要求时，它就可以将自己的宽高值设置下去。
+
+MeasureSpec.AT_MOST
+
+此模式下，子 View 希望它的宽或者高由自己决定。ViewGroup 当然要尊重它的要求，但是也有个前提，那就是你不能超过我能提供的最大值，也就是它期望宽高不能超过父类提供的建议宽高。
+ 当一个 View 的 layout_width 或者 layout_height 的取值为 wrap_content 时，它的测量模式就是 MeasureSpec.AT_MOST。
+
+
+
+
+
+
+
+
+
+这次可以看到，宽高都和 ViewGroup 一致了。
+
+但是，这不是我想要的啊！
+
+wrap_content 对应的测量模式是 MeasureSpec.AT_MOST,所以它的第一要求就是 size 是由 View 本身决定，最大不超过 ViewGroup 能给予的建议数值。
+
+TestView 如果在宽高上设置 wrap_content 属性，也就代表着，它的大小由它的内容决定，在这里它的内容其实就是它中间位置的字符串。显然上面的不符合要求，那么就显然需要我们自己对测量进行处理。
+ 我们的思路可以如下：
+1. 对于 MeasureSpec.EXACTLY 模式，我们不做处理，将 ViewGroup 的建议数值作为最终的宽高。
+2. 对于 MeasureSpec.AT_MOST 模式，我们要根据自己的内容计算宽高，但是数值不得超过 ViewGroup 给出的建议值。
+
+
+
+
+在onMeasure()方法中一定要调用setMeasuredDimension()，或者调用super.onMeasure(widthMeasureSpec, heightMeasureSpec); 否则运行会报一下错误：
+
+07-03 10:19:20.736 12863-12863/com.github.liangyunfeng.measure E/AndroidRuntime: FATAL EXCEPTION: main
+                                                                                 Process: com.github.liangyunfeng.measure, PID: 12863
+                                                                                 java.lang.IllegalStateException: View with id -1: com.github.liangyunfeng.measure.test1.TestOneView#onMeasure() did not set the measured dimension by calling setMeasuredDimension()
+                                                                                     at android.view.View.measure(View.java:21303)
+                                                                                     at android.widget.RelativeLayout.measureChildHorizontal(RelativeLayout.java:715)
+                                                                                     at android.widget.RelativeLayout.onMeasure(RelativeLayout.java:461)
+                                                                                     at android.view.View.measure(View.java:21291)
+                                                                                     at android.view.ViewGroup.measureChildWithMargins(ViewGroup.java:6443)
+                                                                                     at android.widget.FrameLayout.onMeasure(FrameLayout.java:185)
+                                                                                     at android.support.v7.widget.ContentFrameLayout.onMeasure(ContentFrameLayout.java:139)
+                                                                                     at android.view.View.measure(View.java:21291)
+                                                                                     at android.view.ViewGroup.measureChildWithMargins(ViewGroup.java:6443)
+                                                                                     at android.support.v7.widget.ActionBarOverlayLayout.onMeasure(ActionBarOverlayLayout.java:391)
+                                                                                     at android.view.View.measure(View.java:21291)
+                                                                                     at android.view.ViewGroup.measureChildWithMargins(ViewGroup.java:6443)
+                                                                                     at android.widget.FrameLayout.onMeasure(FrameLayout.java:185)
+                                                                                     at android.view.View.measure(View.java:21291)
+                                                                                     at android.view.ViewGroup.measureChildWithMargins(ViewGroup.java:6443)
+                                                                                     at android.widget.LinearLayout.measureChildBeforeLayout(LinearLayout.java:1464)
+                                                                                     at android.widget.LinearLayout.measureVertical(LinearLayout.java:758)
+                                                                                     at android.widget.LinearLayout.onMeasure(LinearLayout.java:640)
+                                                                                     at android.view.View.measure(View.java:21291)
+                                                                                     at android.view.ViewGroup.measureChildWithMargins(ViewGroup.java:6443)
+                                                                                     at android.widget.FrameLayout.onMeasure(FrameLayout.java:185)
+                                                                                     at com.android.internal.policy.DecorView.onMeasure(DecorView.java:916)
+                                                                                     at android.view.View.measure(View.java:21291)
+                                                                                     at android.view.ViewRootImpl.performMeasure(ViewRootImpl.java:2639)
+                                                                                     at android.view.ViewRootImpl.measureHierarchy(ViewRootImpl.java:1697)
+                                                                                     at android.view.ViewRootImpl.performTraversals(ViewRootImpl.java:1952)
+                                                                                     at android.view.ViewRootImpl.doTraversal(ViewRootImpl.java:1569)
+                                                                                     at android.view.ViewRootImpl$TraversalRunnable.run(ViewRootImpl.java:7296)
+                                                                                     at android.view.Choreographer$CallbackRecord.run(Choreographer.java:930)
+                                                                                     at android.view.Choreographer.doCallbacks(Choreographer.java:705)
+                                                                                     at android.view.Choreographer.doFrame(Choreographer.java:640)
+                                                                                     at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:916)
+                                                                                     at android.os.Handler.handleCallback(Handler.java:751)
+                                                                                     at android.os.Handler.dispatchMessage(Handler.java:95)
+                                                                                     at android.os.Looper.loop(Looper.java:154)
+                                                                                     at android.app.ActivityThread.main(ActivityThread.java:6823)
+                                                                                     at java.lang.reflect.Method.invoke(Native Method)
+                                                                                     at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:1563)
+                                                                                     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1451)
+
+
+
+
+
+
+
+
+ScrollerLayout.java 继承ViewGroup
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {     // 这里有个疑问，参数中的widthMeasureSpec和heightMeasureSpec是根据xml布局文件中设置layout_width和layout_height的值传过来的？还是上一层父Viewgroup传过来的呢？
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);                   // 1.这个为了保证ViewGroup本身的测绘
+        int childCount = getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View childView = getChildAt(i);
+            // 为ScrollerLayout中的每一个子控件测量大小
+            measureChild(childView, widthMeasureSpec, heightMeasureSpec);       // 2.传ViewGroup的参数给childView使用，这样childView就可以最大使用这个ViewGroup的width和height
+        }
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        if (changed) {
+            int childCount = getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                View childView = getChildAt(i);
+                // 为ScrollerLayout中的每一个子控件在水平方向上进行布局
+                childView.layout(i * childView.getMeasuredWidth(), 0, (i + 1) * childView.getMeasuredWidth(), childView.getMeasuredHeight());
+            }
+            // 初始化左右边界值
+            leftBorder = getChildAt(0).getLeft();
+            rightBorder = getChildAt(getChildCount() - 1).getRight();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+前面说过 ViewGroup 本质上也是一个 View，只不过它多了布局子元素的义务。既然是 View 的话，那么自定义一个 ViewGroup 也需要从测量开始，问题的关键是如何准确地得到这个 ViewGroup 尺寸信息？
+
+我们还是需要仔细讨论。
+1.当 TestViewGroup 某一维度上的测量模式为 MeasureSpec.EXACTLY 时，这时候的尺寸就可以按照父容器传递过来的建议尺寸。要知道 ViewGroup 也有自己的 parent，在它的父容器中，它也只是一个 View。
+2.当 TestViewGroup 某一维度上的测量模式为 MeasureSpec.AT_MOST 时，这就需要 TestViewGroup 自己计算这个维度上的尺寸数值。就上面给出的信息而言，TestViewGroup 的尺寸非常简单，那就是在一个维度上用自身 padding + 各个子元素的尺寸（包含子元素的宽高+子元素设置的 marging ）得到一个可能的尺寸数值。然后用这个尺寸数值与 TestViewGroup 的父容器给出的建议 Size 进行比较，最终结果取最较小值。
+3.当 TestViewGroup 某一维度上的测量模式为 MeasureSpec.AT_MOST 时，因为要计算子元素的尺寸，所以如何准确得到子元素的尺寸也是至关重要的事情。好在 Android 提供了现成的 API。
+4.当 TestViewGroup 测量成功后，就需要布局了。自定义 View 基本上不要处理这一块，但是自定义 ViewGroup，这一部分却不可缺少。但本篇文章不是讨论布局技巧的，只是告诉大家布局其实相对而言更简单一点，无非是确定好子元素的坐标然后进行布局。
+
+
+
+
+
+
+
+
+
+
+对子元素进行尺寸的测量
+measureChildren(widthMeasureSpec,heightMeasureSpec);
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+        /**resultW 代表最终设置的宽，resultH 代表最终设置的高*/
+        int resultW = widthSize;
+        int resultH = heightSize;
+
+        /**计算尺寸的时候要将自身的 padding 考虑进去*/
+        int contentW = getPaddingLeft() + getPaddingRight();
+        int contentH = getPaddingTop() + getPaddingBottom();
+
+        /**对子元素进行尺寸的测量，这一步必不可少*/
+        measureChildren(widthMeasureSpec, heightMeasureSpec);                   // 1. 先对所有子元素进行尺寸的测量
+
+        MarginLayoutParams layoutParams = null;
+
+        for (int i = 0; i < getChildCount(); i++) {                             // 2. 再对所有子元素的尺寸进行计算和调整来确定ViewGroup的尺寸
+            View child = getChildAt(i);
+            layoutParams = (MarginLayoutParams) child.getLayoutParams();
+
+            //子元素不可见时，不参与布局，因此不需要将其尺寸计算在内
+            if (child.getVisibility() == View.GONE) {
+                continue;
+            }
+
+            contentW += child.getMeasuredWidth()
+                    + layoutParams.leftMargin + layoutParams.rightMargin;
+
+            contentH += child.getMeasuredHeight()
+                    + layoutParams.topMargin + layoutParams.bottomMargin;
+        }
+
+        /**重点处理 AT_MOST 模式，TestViewGroup 通过子元素的尺寸自主决定数值大小，但不能超过
+         *  ViewGroup 给出的建议数值
+         * */
+        if (widthMode == MeasureSpec.AT_MOST) {
+            resultW = contentW < widthSize ? contentW : widthSize;
+        }
+
+        if (heightMode == MeasureSpec.AT_MOST) {
+            resultH = contentH < heightSize ? contentH : heightSize;
+        }
+
+        //一定要设置这个函数，不然会报错
+        setMeasuredDimension(resultW, resultH);
+    }
+
+
+
+
+
+
+
+
+
+
+总结
+
+如果你一直顺序阅读到这个地方，我要对你说声感谢，谢谢你的捧场。
+
+此文最终的目的不是为了让你困惑，如果因为篇幅过长，影响了你们的思维，我最后再做一点总结。
+
+1.View 的测量是从 measure() 方法开始到 onMeasure()。
+
+
+2.View 的 onMeasure() 中会接收到 parent 给出的测量规格建议。测量规格包含测量模式和建议尺寸。
+
+
+3.测量模式包含 MeasureSpec.EXACTLY、MeasureSpec.AT_MOST、和 MeasureSpec.UNSPECIFIED。
+
+
+4.View 复写 onMeasure() 方法时，一般不处理 MeasureSpec.UNSPECIFIED 测量模式，对于 MeasureSpec.EXACTLY 模式，直接设定 parent 给出的测试尺寸。需要特别处理的是 MeasureSpec.AT_MOST，它需要的是自主决定尺寸数值，但是不得大于 parent 给出的建议尺寸。
+
+
+5.View 复写 onMeasure() 方法最后要通过 setMeasuredDimension() 设置尺寸，不然会报错异常。
+
+
+6.ViewGroup 自定义比 View 稍难，因为 onMeasure() 方法中要根据子元素来决定自己的宽高，所以要测量子元素的尺寸，通过 measureChildren() 或者根据 measureChild() 方法，然后通过 getMeasureWidth() / getMeasureHeight() 获取子元素期望的尺寸。
+
+
+7.Activity 有一棵控件树，DecorView 是它最顶层的 View,但 Activity 相关联的 ViewRootImpl 对象操纵着它们。
+
+
+以上。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
