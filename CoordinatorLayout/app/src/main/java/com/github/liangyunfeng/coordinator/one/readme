@@ -1,0 +1,161 @@
+
+
+但是，对于我们而言，我们要实现一个 Behavior，我们用来干嘛呢？
+
+是的，问问自己吧，我们如果自定义一个 Behavior，我们想干嘛？
+
+前面内容有讲过，CoordinatorLayout 可以定义与它 child 的交互或者是某些 child 之间的交互。
+
+
+
+
+
+
+
+
+一般我们自定义一个 Behavior，目的有两个:
+
+1.一个是根据某些依赖的 View 的位置进行相应的操作。
+
+2.另外一个就是响应 CoordinatorLayout 中某些组件的滑动事件。
+
+
+
+
+
+我们先看第一种情况。
+
+两个 View 之间的依赖关系
+
+如果一个 View 依赖于另外一个 View。那么它可能需要操作下面 3 个 API：
+public boolean layoutDependsOn(CoordinatorLayout parent, V child, View dependency) { return false; }
+
+public boolean onDependentViewChanged(CoordinatorLayout parent, V child, View dependency) {  return false; }
+
+public void onDependentViewRemoved(CoordinatorLayout parent, V child, View dependency) {}
+
+
+
+
+
+
+
+
+
+
+到此，我们算是弄明白了在 Behavior 中针对被依赖的对象尺寸及位置变化时，依赖方应该如何处理的流程了。
+接着往下的内容就是处理滑动相关了。不过，在这之前先对一个地方进行说明，那就是如何对于一个 View 设置 Behavior。
+
+
+
+
+
+
+
+
+Behavior 的设置方法
+
+1. 在 xml 属性中进行设置
+
+对应属性是 app:layout_behavior。要设置的是一条字符串，一般是 Behavior 的全限定类名如 com.frank.supportdesigndemo.MyBehavior,当然，在当前目录下你可以用 . 代替如 .MyBehavior。
+
+
+2. 在代码中设置
+
+主要是设置对应 View 的 LayoutParam
+CoordinatorLayout.LayoutParams layoutParams =
+    (CoordinatorLayout.LayoutParams) mIvTest.getLayoutParams();
+
+layoutParams.setBehavior(new MyBehavior());
+
+
+3. 通过注解
+
+自定义 View 时，通过 CoordinatorLayout.DefaultBehavior 这个注解，就可以为该 View 默认绑定一个对应的 Behavior。Android 源码中有现成的例子。
+@CoordinatorLayout.DefaultBehavior(AppBarLayout.Behavior.class)
+public class AppBarLayout extends LinearLayout {}
+
+
+可以看到 AppBarLayout 被注解绑定了 AppBarLayout.Behavior 这个 Behavior。
+所以，之后要研究 AppBarLayout 的话也需要研究它的 Behavior。不过，这是后话。
+
+
+
+
+
+
+
+Behavior 对滑动事件的响应。
+
+其实对于这样的行为，我存在过困惑。官方文档的内容太少了，说的是滑动，但是我并不明白是什么滑动。是响应谁的滑动。
+
+我们一般接触到的滑动控件是 ScrollView、ListView 和 RecyclerView。而 CoordinatorLayout 本身能够滑动吗？
+
+滑动相关的代码如下：
+public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout,
+            V child, View directTargetChild, View target, int nestedScrollAxes) {
+        return false;
+    }
+
+public void onNestedScrollAccepted(CoordinatorLayout coordinatorLayout, V child,
+        View directTargetChild, View target, int nestedScrollAxes) {
+    // Do nothing
+}
+
+public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, V child, View target) {
+    // Do nothing
+}
+
+public void onNestedScroll(CoordinatorLayout coordinatorLayout, V child, View target,
+        int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
+    // Do nothing
+}
+
+public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, V child, View target,
+        int dx, int dy, int[] consumed) {
+    // Do nothing
+}
+
+public boolean onNestedFling(CoordinatorLayout coordinatorLayout, V child, View target,
+        float velocityX, float velocityY, boolean consumed) {
+    return false;
+}
+
+public boolean onNestedPreFling(CoordinatorLayout coordinatorLayout, V child, View target,
+        float velocityX, float velocityY) {
+    return false;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+自定义 Behavior 的总结
+1.确定 CoordinatorLayout 中 View 与 View 之间的依赖关系，通过 layoutDependsOn() 方法，返回值为 true 则依赖，否则不依赖。
+2.当一个被依赖项 dependency 尺寸或者位置发生变化时，依赖方会通过 Byhavior 获取到，然后在 onDependentViewChanged 中处理。如果在这个方法中 child 尺寸或者位置发生了变化，则需要 return true。
+3.当 Behavior 中的 View 准备响应嵌套滑动时，它不需要通过 layoutDependsOn() 来进行依赖绑定。只需要在 onStartNestedScroll() 方法中通过返回值告知 ViewParent，它是否对嵌套滑动感兴趣。返回值为 true 时，后续的滑动事件才能被响应。
+4.嵌套滑动包括滑动(scroll) 和 快速滑动(fling) 两种情况。开发者根据实际情况运用就好了。
+5.Behavior 通过 3 种方式绑定：1. xml 布局文件。2. 代码设置 layoutparam。3. 自定义 View 的注解。
+
+
+
